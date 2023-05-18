@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace AricsStandardDataTypeLibrary
 {
-    public struct Victor2
+    public struct Point
     {
         public int x; public int y;
 
-        public Victor2(int ix, int iy)
+        public Point(int ix, int iy)
         {
             x = ix;
             y = iy;
         }
-        public static Victor2 Zero()
+        public static Point Zero()
         {
-            return new Victor2(0, 0);
+            return new Point(0, 0);
         }
         public void modifyX(int ix)
         {
@@ -79,24 +79,30 @@ namespace AricsStandardDataTypeLibrary
     }
     public struct Tile
     {
-        public Victor2 position;
+        public Point position;
         public List<Tile> neighbours;
         public string symbol;
-        public Tile(Victor2 ipos)
+        public string defaultSymbol;
+        public Tile(Point ipos)
         {
             position = ipos;
             neighbours = new List<Tile>();
             symbol = "~";
+            defaultSymbol = symbol;
         }
         public void setNeighbours(List<Tile> ineighbours)
         {
             neighbours=ineighbours;
         }
+        public void setSymbol(string s)
+        {
+            symbol = s;
+        }
     }
     public struct Map 
     {
         public Tile[][] tiles;
-        public Map(Victor2 mapDimensions)
+        public Map(Point mapDimensions)
         {
             tiles = new Tile[mapDimensions.y][];
             for (int y = 0; y < mapDimensions.x; y++)
@@ -104,9 +110,26 @@ namespace AricsStandardDataTypeLibrary
                 tiles[y] = new Tile[mapDimensions.x];
                 for (int x = 0; x < mapDimensions.x; x++)
                 {
-                    tiles[y][x] = new Tile(new Victor2(x, y));
+                    tiles[y][x] = new Tile(new Point(x, y));
                 }
             }
+        }
+        public Point randomPoint()
+        {
+            Random r = new Random();
+            while (true)
+            {
+                int y = r.Next(0, tiles.Count());
+                int x = r.Next(0, tiles[y].Count());
+                if (tiles[y][x].symbol == tiles[y][x].defaultSymbol)
+                {
+                    return new Point(x, y);
+                }
+            }
+        }
+        public void setSymbol(Point toChange,string symbol)
+        {
+            tiles[toChange.y][toChange.x].setSymbol(symbol);
         }
         public void setNeighbours()
         {
@@ -114,11 +137,11 @@ namespace AricsStandardDataTypeLibrary
             {
                 for (int x = 0; x < tiles[y].Length; x++)
                 {
-                    tiles[y][x].setNeighbours(determineNeighbours(new Victor2(y, x)));
+                    tiles[y][x].setNeighbours(determineNeighbours(new Point(y, x)));
                 }
             }
         }
-        public List<Tile> determineNeighbours(Victor2 position)
+        public List<Tile> determineNeighbours(Point position)
         {
             List<Tile> neighbours = new List<Tile>();
             if (position.x != 0 && position.x != tiles[position.y].Length - 1)
