@@ -13,9 +13,12 @@ namespace Snake
         string moveDirection = "Up";
         Map map;
         Point food;
+        public int points;
+        public bool lost = false;
         public SnakeController(Point startPosition)
         {
             snakeTiles.Add(startPosition);
+            points = 0;
         }
         public void passMap(Map m)
         {
@@ -26,9 +29,9 @@ namespace Snake
         {
             moveDirection = direction;
         }
-
-        public void move()
+        public bool move()
         {
+            bool toReturn = false;
             if (food.Equals(new Point(0,0))||food.Equals(snakeTiles[0]))
             {
                 food = map.randomPoint();
@@ -51,11 +54,25 @@ namespace Snake
                     headPoint = new Point(snakeTiles[0].x + 1, snakeTiles[0].y);
                     break;
             }
-
+            bool overlap = false;
+            for(int i = 1; i < snakeTiles.Count(); i++)
+            {
+                if (headPoint.Equals(snakeTiles[i]))
+                {
+                    overlap = true;
+                }
+            }
+            if (headPoint.x < 0 || headPoint.y < 0 || headPoint.x >= map.tiles.Count() || headPoint.y >= map.tiles.Count()||overlap)
+            {
+                lost = true;
+                return false;
+            }
 
             if (headPoint.x == food.x && headPoint.y == food.y)
             {
                 snakeTiles.Insert(0,headPoint);
+                points += 100;
+                toReturn= true;
             }
             else
             {
@@ -69,6 +86,8 @@ namespace Snake
             
             map.setSymbol(headPoint, "O");
             snakeTiles[0] = headPoint;
+            
+            return toReturn;
         }
     }
 }
