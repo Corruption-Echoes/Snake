@@ -39,7 +39,7 @@ namespace Snake
                         lastSymbol = tile.symbol;
                         toWrite = "";
                     }
-                    toWrite +=tile.symbol+"-";
+                    toWrite +=tile.symbol+ tile.symbol;
                 }
                 toWrite+="\n";
             }
